@@ -2,7 +2,7 @@
 Supabase database client
 """
 from supabase import create_client
-from sentence_transformers import SentenceTransformer
+#from sentence_transformers import SentenceTransformer
 from config import settings
 
 
