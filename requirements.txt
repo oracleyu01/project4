@@ -1,12 +1,8 @@
 streamlit
-pandas<2.2.0
+pandas==2.1.4
 python-dotenv
 numpy
 supabase
 openai
-langchain
-langchain-core
-langgraph
 requests
 beautifulsoup4
-langsmith
