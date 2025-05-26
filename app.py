@@ -1,5 +1,5 @@
 """
-Smart Shopping App - Main Streamlit Application
+Smart Shopping App - Main Streamlit Application with OpenAI Embeddings
 """
 import streamlit as st
 from datetime import datetime
@@ -53,7 +53,8 @@ if search_button and product_name:
             "cons": [],
             "sources": [],
             "messages": [],
-            "error": ""
+            "error": "",
+            "similar_products": []
         }
         
         # Run workflow
@@ -64,6 +65,8 @@ if search_button and product_name:
         # Show search method
         if final_state["search_method"] == "database":
             st.success(f"✅ 데이터베이스에서 '{product_name}' 정보를 찾았습니다!")
+        elif final_state["search_method"] == "similarity":
+            st.info(f"🤖 AI 유사도 검색으로 관련 제품 정보를 찾았습니다!")
         else:
             st.warning(f"🔄 웹에서 '{product_name}' 정보를 실시간으로 수집했습니다!")
         
@@ -88,7 +91,12 @@ if search_button and product_name:
         with col2:
             st.metric("총 단점", f"{len(final_state['cons'])}개")
         with col3:
-            st.metric("검색 방법", "DB" if final_state["search_method"] == "database" else "웹")
+            method_display = {
+                "database": "DB (정확히 일치)",
+                "similarity": "AI 유사도 검색",
+                "web_crawling": "웹 크롤링"
+            }
+            st.metric("검색 방법", method_display.get(final_state["search_method"], "웹"))
         
         # Sources (for web crawling)
         if final_state["sources"]:
@@ -108,10 +116,16 @@ if search_button and product_name:
 
 # Footer information
 st.markdown("---")
-st.info("💡 검색 프로세스는 LangSmith에서 상세히 확인할 수 있습니다.")
+col1, col2 = st.columns(2)
+with col1:
+    st.info("💡 검색 프로세스는 LangSmith에서 상세히 확인할 수 있습니다.")
+with col2:
+    st.info("🤖 OpenAI 임베딩을 사용하여 유사한 제품도 찾아드립니다.")
+
 current_date = datetime.now().strftime('%Y년 %m월 %d일')
 st.markdown(f"""
 <div style="text-align: center; color: #666; padding: 2rem;">
     <p>마지막 업데이트: {current_date}</p>
+    <p>Powered by OpenAI Embeddings & LangGraph</p>
 </div>
 """, unsafe_allow_html=True)
