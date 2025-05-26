@@ -12,7 +12,7 @@ class SupabaseClient:
             settings.SUPABASE_URL,
             settings.SUPABASE_KEY
         )
-        self.model = SentenceTransformer('jhgan/ko-sroberta-multitask')
+       # self.model = SentenceTransformer('jhgan/ko-sroberta-multitask')
     
     def search_exact(self, product_name):
         """Search for exact product name match"""
