@@ -2,15 +2,17 @@
 streamlit==1.31.1
 pandas==2.2.0
 python-dotenv==1.0.1
+numpy==1.26.3
 
 # Database
 supabase==2.3.4
 
-# AI/ML
+# AI/ML (OpenAI only)
 openai==1.12.0
 langchain==0.1.6
 langchain-core==0.1.25
 langgraph==0.0.26
+langchain-openai==0.0.5
 
 # Web scraping
 requests==2.31.0
