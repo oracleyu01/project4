@@ -42,6 +42,19 @@ def search_database(state: SearchState) -> SearchState:
             )
             return state
         
+        # Try similarity search
+        state["messages"].append(
+            AIMessage(content="No exact match found, trying similarity search...")
+        )
+        similar_match = supabase_client.search_similar(product_name, threshold=0.7)
+        if similar_match and similar_match.data:
+            state["search_method"] = "similarity"
+            state["results"] = {"data": similar_match.data}
+            state["messages"].append(
+                AIMessage(content=f"Found similar product in database using AI similarity")
+            )
+            return state
+        
         state["messages"].append(
             AIMessage(content="No results found in database, will search web")
         )
@@ -119,6 +132,17 @@ def crawl_web(state: SearchState) -> SearchState:
     state["cons"] = list(dict.fromkeys(all_cons))[:10]
     state["sources"] = sources[:5]
     
+    # Save to database with embeddings if we found data
+    if state["pros"] or state["cons"]:
+        state["messages"].append(
+            AIMessage(content="Saving results to database with embeddings...")
+        )
+        supabase_client.insert_pros_cons_with_embedding(
+            product_name, 
+            state["pros"], 
+            state["cons"]
+        )
+    
     state["messages"].append(
         AIMessage(content=f"Web crawl complete. Found {len(state['pros'])} pros and {len(state['cons'])} cons")
     )
@@ -128,7 +152,7 @@ def crawl_web(state: SearchState) -> SearchState:
 
 def process_results(state: SearchState) -> SearchState:
     """Process and organize results"""
-    if state["search_method"] == "database" and state["results"].get("data"):
+    if state["search_method"] in ["database", "similarity"] and state["results"].get("data"):
         # Process DB results
         data = state["results"]["data"]
         state["pros"] = [item['content'] for item in data if item['type'] == 'pro']
@@ -136,7 +160,7 @@ def process_results(state: SearchState) -> SearchState:
         state["sources"] = []  # No sources for DB results
         
         state["messages"].append(
-            AIMessage(content=f"Processed database results: {len(state['pros'])} pros, {len(state['cons'])} cons")
+            AIMessage(content=f"Processed results: {len(state['pros'])} pros, {len(state['cons'])} cons")
         )
     
     return state
