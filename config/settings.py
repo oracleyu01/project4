@@ -28,3 +28,6 @@ if LANGSMITH_API_KEY:
     os.environ["LANGCHAIN_API_KEY"] = LANGSMITH_API_KEY
 else:
     os.environ["LANGCHAIN_TRACING_V2"] = "false"
+
+# OpenAI Embedding Model
+EMBEDDING_MODEL = "text-embedding-ada-002"
